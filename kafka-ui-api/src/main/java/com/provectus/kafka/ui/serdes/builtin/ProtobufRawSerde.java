@@ -1,6 +1,6 @@
 package com.provectus.kafka.ui.serdes.builtin;
 
-import com.google.protobuf.UnknownFieldSet;
+import com.hootsuite.eventbus.events.deserialize.EventListDeserializer;
 import com.provectus.kafka.ui.exception.ValidationException;
 import com.provectus.kafka.ui.serde.api.DeserializeResult;
 import com.provectus.kafka.ui.serde.api.RecordHeaders;
@@ -8,6 +8,7 @@ import com.provectus.kafka.ui.serde.api.SchemaDescription;
 import com.provectus.kafka.ui.serdes.BuiltInSerde;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 
 public class ProtobufRawSerde implements BuiltInSerde {
@@ -48,8 +49,11 @@ public class ProtobufRawSerde implements BuiltInSerde {
         @Override
         public DeserializeResult deserialize(RecordHeaders headers, byte[] data) {
             try {
-              UnknownFieldSet unknownFields = UnknownFieldSet.parseFrom(data);
-              return new DeserializeResult(unknownFields.toString(), DeserializeResult.Type.STRING, Map.of());
+              var events = EventListDeserializer.deserialize(data);
+              var serialized = events.stream().map(e ->
+                e.getDescriptorForType().getName() + " {\n" + e.toString().replaceAll("(?m)^", "  ") + "}"
+              ).collect(Collectors.joining("\n"));
+              return new DeserializeResult(serialized, DeserializeResult.Type.STRING, Map.of());
             } catch (Exception e) {
               throw new ValidationException(e.getMessage());
             }
