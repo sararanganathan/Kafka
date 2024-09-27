@@ -1,6 +1,18 @@
 auth:
   type: DISABLED
 
+server:
+  port: 8080
+
+kafka:
+  clusters:
+    - name: dev
+      bootstrapServers: b-1.eventbusmskdevelopment.6x9wvy.c8.kafka.us-east-1.amazonaws.com:9092,b-2.eventbusmskdevelopment.6x9wvy.c8.kafka.us-east-1.amazonaws.com:9092,b-3.eventbusmskdevelopment.6x9wvy.c8.kafka.us-east-1.amazonaws.com:9092
+      defaultValueSerde: ProtobufDecodeRaw
+    - name: staging
+      bootstrapServers: b-1.eventbusmskstaging.gxfvi6.c2.kafka.us-east-1.amazonaws.com:9092,b-2.eventbusmskstaging.gxfvi6.c2.kafka.us-east-1.amazonaws.com:9092,b-3.eventbusmskstaging.gxfvi6.c2.kafka.us-east-1.amazonaws.com:9092
+      defaultValueSerde: ProtobufDecodeRaw
+
 management:
   endpoint:
     info:
